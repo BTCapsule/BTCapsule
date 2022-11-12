@@ -269,18 +269,17 @@ def main():
 
 
 
+		p2sh.delete(0, END)
 		p2sh.insert(END, f"{p2sh_addr}")
 		p2sh.bind("<FocusIn>", lambda args: p2sh.insert(END, ''))
 		
-		
+		sk.delete(0, END)
 		sk.insert(END, f"{sender_privk}")
 		sk.bind("<FocusIn>", lambda args: sk.insert(END, ''))
 		
+		sa.delete(0, END)
 		sa.insert(END, f"{sender_pubk}")
 		sa.bind("<FocusIn>", lambda args: sa.insert(END, ''))
-
-	
-
 
 
 		canvas1.create_text(225,entry_y+-50,fill="black",
