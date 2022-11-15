@@ -1,5 +1,6 @@
 import os
 import os.path
+import shutil
 from tkinter import *
 from os.path import exists
 import datetime
@@ -8,6 +9,7 @@ import time
 from decimal import Decimal
 from stat import S_IREAD
 from itertools import islice
+import threading
 
 import pyqrcode
 import png
@@ -102,6 +104,7 @@ def main():
 
     sender_exists = exists("sender_wallet.txt")
     rec_exists = exists("receiver_wallet.txt")
+    btc_exists = exists("BTCapsule.exe")
 
     seq = Sequence(TYPE_ABSOLUTE_TIMELOCK, 500000001)
 
@@ -251,17 +254,17 @@ def main():
         text="Paste txid/hash from transaction above",
     )
 
-    amount = Entry(root, relief=SOLID, width=20)
-
-    canvas1.create_window(355, entry_y + 245, window=amount)
-
-    canvas1.create_text(350, entry_y + 220, fill="black", font="Arial 10", text="BTC")
-
     vout_enter = Entry(root, relief=SOLID, width=5)
 
     canvas1.create_window(125, entry_y + 245, window=vout_enter)
 
     canvas1.create_text(125, entry_y + 220, fill="black", font="Arial 10", text="VOUT")
+    
+    amount = Entry(root, relief=SOLID, width=20)
+
+    canvas1.create_window(355, entry_y + 245, window=amount)
+
+    canvas1.create_text(350, entry_y + 220, fill="black", font="Arial 10", text="BTC")
 
     def complete():
 
@@ -273,6 +276,16 @@ def main():
             and sk.get() != ""
             and sa.get() != ""
         ):
+
+   
+            label1 = Label(
+                root,
+                bg="white",
+                text="Please wait while files are created",
+            )
+            canvas1.create_window(225, entry_y + 270, window=label1)
+
+
 
             txid = txid_input.get()
             satoshis = Decimal(amount.get())
@@ -486,11 +499,37 @@ this means the transaction is working as expected. Please wait a few hours and t
                 rec_wallet.close()
 
                 os.chmod("receiver_wallet.txt", S_IREAD)
+                 
+                os.mkdir('receiver_files')
+                rec_path = 'receiver_files/'
+                
+                os.mkdir('sender_files')
+                send_files = 'sender_files/'
+             
+                shutil.copy('timelock_qr_copy.png', rec_path)
+                shutil.copy('receiver_wallet.txt', rec_path)
+                
+                shutil.copy('BTCapsule.py', rec_path)
+
+
+                sender_files = [f for f in os.listdir() if '.txt' in f.lower() or '.png' in f.lower()] 
+
+                for files in sender_files: 
+
+                    new_path = send_files + files 
+                    shutil.move(files, new_path)
+
+                
+                shutil.copy('BTCapsule.py', send_files)
+
+                if btc_exists == True:
+                    shutil.copy('BTCapsule.exe', send_files)
+                    shutil.copy('BTCapsule.exe', rec_path)
 
                 label1 = Label(
                     root,
                     bg="white",
-                    text="                 Success!                   ",
+                    text="                    Success!                      ",
                 )
                 canvas1.create_window(225, entry_y + 270, window=label1)
 
@@ -514,7 +553,7 @@ this means the transaction is working as expected. Please wait a few hours and t
                 text="Please enter all fields",
             )
 
-    button1 = Button(text="Enter", command=lambda: complete())
+    button1 = Button(text="Enter", command=threading.Thread(target=complete).start)
     canvas1.create_window(225, entry_y + 300, window=button1)
 
     # SWEEP WALLET

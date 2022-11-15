@@ -1,5 +1,6 @@
 import os
 import os.path
+import shutil
 from tkinter import *
 from os.path import exists
 import datetime
@@ -8,6 +9,7 @@ import time
 from decimal import Decimal
 from stat import S_IREAD
 from itertools import islice
+import threading
 
 import pyqrcode
 import png
@@ -100,8 +102,9 @@ def sweep_wallet(wa, t, s, prk, a):
 
 def main():
 
-    sender_exists = exists("sender_wallet.txt")
-    rec_exists = exists("receiver_wallet.txt")
+    sender_exists = exists("sender_wallet_testnet.txt")
+    rec_exists = exists("receiver_wallet_testnet.txt")
+    btc_exists = exists("BTCapsule.exe")
 
     seq = Sequence(TYPE_ABSOLUTE_TIMELOCK, 500000001)
 
@@ -251,17 +254,17 @@ def main():
         text="Paste txid/hash from transaction above",
     )
 
-    amount = Entry(root, relief=SOLID, width=20)
-
-    canvas1.create_window(355, entry_y + 245, window=amount)
-
-    canvas1.create_text(350, entry_y + 220, fill="black", font="Arial 10", text="BTC")
-
     vout_enter = Entry(root, relief=SOLID, width=5)
 
     canvas1.create_window(125, entry_y + 245, window=vout_enter)
 
     canvas1.create_text(125, entry_y + 220, fill="black", font="Arial 10", text="VOUT")
+    
+    amount = Entry(root, relief=SOLID, width=20)
+
+    canvas1.create_window(355, entry_y + 245, window=amount)
+
+    canvas1.create_text(350, entry_y + 220, fill="black", font="Arial 10", text="BTC")
 
     def complete():
 
@@ -273,6 +276,16 @@ def main():
             and sk.get() != ""
             and sa.get() != ""
         ):
+
+   
+            label1 = Label(
+                root,
+                bg="white",
+                text="Please wait while files are created",
+            )
+            canvas1.create_window(225, entry_y + 270, window=label1)
+
+
 
             txid = txid_input.get()
             satoshis = Decimal(amount.get())
@@ -397,7 +410,7 @@ file can redeem your bitcoin.
 You can use the redeem script to redeem your bitcoin at any time. To redeem, visit a block explorer 
 (ex. https://www.blockchain.com/btc/pushtx) and paste the redeem script into the input field.
 				
-You can then open BTCapsule and use the Sweep Wallet feature. To sweep a wallet, make sure sender_wallet.txt is
+You can then open BTCapsule and use the Sweep Wallet feature. To sweep a wallet, make sure sender_wallet_testnet.txt is
 in the same folder as BTCapsule. enter the address you wish to send your bitcoin to and the amount that was added 
 to the timelock address (minus miner fees). This will create another file called redeem.txt that will contain 
 another redeem script. Paste this into the block explorer to send the bitcoin to your wallet.
@@ -407,7 +420,7 @@ another redeem script. Paste this into the block explorer to send the bitcoin to
 *IMPORTANT!* Sweeping this wallet will remove all bitcoin. You can choose to input a smaller amount to pay for 
 miner fees. The difference between the unspent amount and the input will go to the miners. If you choose to input
 the full amount, you must add some satoshis to the timelock address to cover the fees.
-To give the timelocked wallet to another person, copy BTCapsule, receiver_wallet.txt, and timelock_qr_copy.png 
+To give the timelocked wallet to another person, copy BTCapsule, receiver_wallet_testnet.txt, and timelock_qr_copy.png 
 to a flash drive. DO NOT INCLUDE SENDER WALLET. Directions to redeem are included in their wallet.
 				
 				
@@ -415,7 +428,7 @@ to a flash drive. DO NOT INCLUDE SENDER WALLET. Directions to redeem are include
 
                 p2sh_addr = p2sh.get()
 
-                sender_wallet = open("sender_wallet.txt", "w")
+                sender_wallet = open("sender_wallet_testnet.txt", "w")
 
                 sender_wallet.write(
                     "TxId: "
@@ -436,7 +449,7 @@ to a flash drive. DO NOT INCLUDE SENDER WALLET. Directions to redeem are include
 
                 sender_wallet.close()
 
-                os.chmod("sender_wallet.txt", S_IREAD)
+                os.chmod("sender_wallet_testnet.txt", S_IREAD)
 
                 rec_wallet_text = """
 This is a timelocked paper wallet. Please keep this file secure and offline. Anyone with access to this 
@@ -445,7 +458,7 @@ file can redeem your bitcoin.
 You can use the redeem script to redeem your bitcoin after the redeem date. To redeem, visit a block explorer 
 (ex. https://www.blockchain.com/btc/pushtx) and paste the redeem script into the input field.
 				
-You can then open BTCapsule and use the Sweep Wallet feature. To sweep a wallet, make sure receiver_wallet.txt is
+You can then open BTCapsule and use the Sweep Wallet feature. To sweep a wallet, make sure receiver_wallet_testnet.txt is
 in the same folder as BTCapsule. enter the address you wish to send your bitcoin to and the amount that was added 
 to the timelock address (minus miner fees). This will create another file called redeem.txt that will contain 
 another redeem script. Paste this into the block explorer to send the bitcoin to your wallet.
@@ -464,7 +477,7 @@ this means the transaction is working as expected. Please wait a few hours and t
 				
 				"""
 
-                rec_wallet = open("receiver_wallet.txt", "w")
+                rec_wallet = open("receiver_wallet_testnet.txt", "w")
 
                 rec_wallet.write(
                     "TxId: "
@@ -485,12 +498,39 @@ this means the transaction is working as expected. Please wait a few hours and t
 
                 rec_wallet.close()
 
-                os.chmod("receiver_wallet.txt", S_IREAD)
+                os.chmod("receiver_wallet_testnet.txt", S_IREAD)
+                 
+                os.mkdir('receiver_files_testnet')
+                rec_path = 'receiver_files_testnet/'
+
+                
+                os.mkdir('sender_files_testnet')
+                send_files = 'sender_files_testnet/'
+             
+                shutil.copy('timelock_qr_copy.png', rec_path)
+                shutil.copy('receiver_wallet_testnet.txt', rec_path)
+                
+                shutil.copy('BTCapsule_testnet.py', rec_path)
+
+
+                sender_files = [f for f in os.listdir() if '.txt' in f.lower() or '.png' in f.lower()] 
+
+                for files in sender_files: 
+
+                    new_path = send_files + files 
+                    shutil.move(files, new_path)
+
+                
+                shutil.copy('BTCapsule_testnet.py', send_files)
+
+                if btc_exists == True:
+                    shutil.copy('BTCapsule.exe', send_files)
+                    shutil.copy('BTCapsule.exe', rec_path)
 
                 label1 = Label(
                     root,
                     bg="white",
-                    text="                 Success!                   ",
+                    text="                    Success!                      ",
                 )
                 canvas1.create_window(225, entry_y + 270, window=label1)
 
@@ -514,7 +554,7 @@ this means the transaction is working as expected. Please wait a few hours and t
                 text="Please enter all fields",
             )
 
-    button1 = Button(text="Enter", command=lambda: complete())
+    button1 = Button(text="Enter", command=threading.Thread(target=complete).start)
     canvas1.create_window(225, entry_y + 300, window=button1)
 
     # SWEEP WALLET
@@ -560,7 +600,7 @@ this means the transaction is working as expected. Please wait a few hours and t
 
             if sender_exists == True:
 
-                with open("sender_wallet.txt", "r") as f:
+                with open("sender_wallet_testnet.txt", "r") as f:
 
                     f.seek(0)
                     lines = f.readlines()
@@ -588,7 +628,7 @@ this means the transaction is working as expected. Please wait a few hours and t
 
             if rec_exists == True and sender_exists == False:
 
-                with open("receiver_wallet.txt", "r") as f:
+                with open("receiver_wallet_testnet.txt", "r") as f:
 
                     f.seek(0)
                     lines = f.readlines()
