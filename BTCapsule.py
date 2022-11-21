@@ -102,9 +102,11 @@ def sweep_wallet(wa, t, s, prk, a):
 
 def main():
 
-    sender_exists = exists("sender_wallet.txt")
-    rec_exists = exists("receiver_wallet.txt")
+    sender_exists = exists("sender_files/sender_wallet.txt")
+    rec_exists = exists("receiver_files/receiver_wallet.txt")
     btc_exists = exists("BTCapsule.exe")
+    btc_py_exists = exists("BTCapsule.py")
+    btc_linux = exists("BTCapsule")
 
     seq = Sequence(TYPE_ABSOLUTE_TIMELOCK, 500000001)
 
@@ -277,15 +279,6 @@ def main():
             and sa.get() != ""
         ):
 
-   
-            label1 = Label(
-                root,
-                bg="white",
-                text="Please wait while files are created",
-            )
-            canvas1.create_window(225, entry_y + 270, window=label1)
-
-
 
             txid = txid_input.get()
             satoshis = Decimal(amount.get())
@@ -300,248 +293,307 @@ def main():
             pubk = p2sh.get()
             vout = int(vout_enter.get())
 
-            def validate(date_text):
-                try:
-                    datetime.datetime.strptime(date_text, "%m-%d-%Y")
+            if len(txid) == 64:
 
-                    return True
-                except:
 
-                    return False
+                if vout == 0 or vout == 1:
 
-            if validate(iso) == True:
+                    def validate(date_text):
+                        try:
+                            datetime.datetime.strptime(date_text, "%m-%d-%Y")
 
-                unix = dp.parse(iso)
-                unix_dec = unix.timestamp()
-                unix_time = int(unix_dec)
+                            return True
+                        except:
 
-                # SENDER REDEEM
+                            return False
 
-                sender_lock = Locktime(500000001)
+                    if validate(iso) == True:
 
-                sender_txin = TxInput(txid, vout, sequence=seq.for_input_sequence())
+                        if (sender_exists == False or rec_exists == False):
+                    
+   
+                            label1 = Label(
+                                root,
+                                bg="white",
+                                text="Please wait while files are created",
+                            )
+                            canvas1.create_window(225, entry_y + 270, window=label1)
 
-                sender_p2pkh_sk = PrivateKey(sender_privk)
-                sender_p2pkh_pk = sender_p2pkh_sk.get_public_key().to_hex()
-                sender_p2pkh_addr = sender_p2pkh_sk.get_public_key().get_address()
 
-                sender_redeem_script = Script(
-                    [
-                        seq.for_script(),
-                        "OP_CHECKLOCKTIMEVERIFY",
-                        "OP_DROP",
-                        "OP_DUP",
-                        "OP_HASH160",
-                        sender_p2pkh_addr.to_hash160(),
-                        "OP_EQUALVERIFY",
-                        "OP_CHECKSIG",
-                    ]
-                )
 
-                sender_addr = P2shAddress.from_script(sender_redeem_script)
+                            unix = dp.parse(iso)
+                            unix_dec = unix.timestamp()
+                            unix_time = int(unix_dec)
 
-                sender_to_addr = P2pkhAddress(sender_pubk)
-                sender_txout = TxOutput(
-                    to_satoshis(satoshis), sender_to_addr.to_script_pub_key()
-                )
+                            # SENDER REDEEM
 
-                sender_tx = Transaction(
-                    [sender_txin], [sender_txout], sender_lock.for_transaction()
-                )
+                            sender_lock = Locktime(500000001)
 
-                sender_sig = sender_p2pkh_sk.sign_input(
-                    sender_tx, 0, sender_redeem_script
-                )
+                            sender_txin = TxInput(txid, vout, sequence=seq.for_input_sequence())
 
-                sender_txin.script_sig = Script(
-                    [sender_sig, sender_p2pkh_pk, sender_redeem_script.to_hex()]
-                )
-                sender_signed_tx = sender_tx.serialize()
+                            sender_p2pkh_sk = PrivateKey(sender_privk)
+                            sender_p2pkh_pk = sender_p2pkh_sk.get_public_key().to_hex()
+                            sender_p2pkh_addr = sender_p2pkh_sk.get_public_key().get_address()
 
-                sender_txid = sender_tx.get_txid()
+                            sender_redeem_script = Script(
+                                [
+                                    seq.for_script(),
+                                    "OP_CHECKLOCKTIMEVERIFY",
+                                    "OP_DROP",
+                                    "OP_DUP",
+                                    "OP_HASH160",
+                                    sender_p2pkh_addr.to_hash160(),
+                                    "OP_EQUALVERIFY",
+                                    "OP_CHECKSIG",
+                                ]
+                            )
 
-                # RECEIVER REDEEM
+                            sender_addr = P2shAddress.from_script(sender_redeem_script)
 
-                rec_lock = Locktime(unix_time)
+                            sender_to_addr = P2pkhAddress(sender_pubk)
+                            sender_txout = TxOutput(
+                                to_satoshis(satoshis), sender_to_addr.to_script_pub_key()
+                            )
 
-                rec_txin = TxInput(txid, vout, sequence=seq.for_input_sequence())
+                            sender_tx = Transaction(
+                                [sender_txin], [sender_txout], sender_lock.for_transaction()
+                            )
 
-                rec_p2pkh_sk = PrivateKey(sender_privk)
-                rec_p2pkh_pk = rec_p2pkh_sk.get_public_key().to_hex()
-                rec_p2pkh_addr = rec_p2pkh_sk.get_public_key().get_address()
+                            sender_sig = sender_p2pkh_sk.sign_input(
+                                sender_tx, 0, sender_redeem_script
+                            )
 
-                rec_redeem_script = Script(
-                    [
-                        seq.for_script(),
-                        "OP_CHECKLOCKTIMEVERIFY",
-                        "OP_DROP",
-                        "OP_DUP",
-                        "OP_HASH160",
-                        rec_p2pkh_addr.to_hash160(),
-                        "OP_EQUALVERIFY",
-                        "OP_CHECKSIG",
-                    ]
-                )
+                            sender_txin.script_sig = Script(
+                                [sender_sig, sender_p2pkh_pk, sender_redeem_script.to_hex()]
+                            )
+                            sender_signed_tx = sender_tx.serialize()
 
-                rec_addr = P2shAddress.from_script(rec_redeem_script)
+                            sender_txid = sender_tx.get_txid()
 
-                rec_to_addr = P2pkhAddress(rec_pubk)
-                rec_txout = TxOutput(
-                    to_satoshis(satoshis), rec_to_addr.to_script_pub_key()
-                )
+                            # RECEIVER REDEEM
 
-                rec_tx = Transaction(
-                    [rec_txin], [rec_txout], rec_lock.for_transaction()
-                )
+                            rec_lock = Locktime(unix_time)
 
-                rec_sig = rec_p2pkh_sk.sign_input(rec_tx, 0, rec_redeem_script)
+                            rec_txin = TxInput(txid, vout, sequence=seq.for_input_sequence())
 
-                rec_txin.script_sig = Script(
-                    [rec_sig, rec_p2pkh_pk, rec_redeem_script.to_hex()]
-                )
-                rec_signed_tx = rec_tx.serialize()
+                            rec_p2pkh_sk = PrivateKey(sender_privk)
+                            rec_p2pkh_pk = rec_p2pkh_sk.get_public_key().to_hex()
+                            rec_p2pkh_addr = rec_p2pkh_sk.get_public_key().get_address()
 
-                rec_txid = rec_tx.get_txid()
+                            rec_redeem_script = Script(
+                                [
+                                    seq.for_script(),
+                                    "OP_CHECKLOCKTIMEVERIFY",
+                                    "OP_DROP",
+                                    "OP_DUP",
+                                    "OP_HASH160",
+                                    rec_p2pkh_addr.to_hash160(),
+                                    "OP_EQUALVERIFY",
+                                    "OP_CHECKSIG",
+                                ]
+                            )
 
-                sender_wallet_text = """
-This is the sender's paper wallet. Please keep this file secure and offline. Anyone with access to this 
-file can redeem your bitcoin.
+                            rec_addr = P2shAddress.from_script(rec_redeem_script)
+
+                            rec_to_addr = P2pkhAddress(rec_pubk)
+                            rec_txout = TxOutput(
+                                to_satoshis(satoshis), rec_to_addr.to_script_pub_key()
+                            )
+
+                            rec_tx = Transaction(
+                                [rec_txin], [rec_txout], rec_lock.for_transaction()
+                            )
+
+                            rec_sig = rec_p2pkh_sk.sign_input(rec_tx, 0, rec_redeem_script)
+
+                            rec_txin.script_sig = Script(
+                                [rec_sig, rec_p2pkh_pk, rec_redeem_script.to_hex()]
+                            )
+                            rec_signed_tx = rec_tx.serialize()
+
+                            rec_txid = rec_tx.get_txid()
+
+                            sender_wallet_text = """
+    This is the sender's paper wallet. Please keep this file secure and offline. Anyone with access to this 
+    file can redeem your bitcoin.
 				
-You can use the redeem script to redeem your bitcoin at any time. To redeem, visit a block explorer 
-(ex. https://www.blockchain.com/btc/pushtx) and paste the redeem script into the input field.
+    You can use the redeem script to redeem your bitcoin at any time. To redeem, visit a block explorer 
+    (ex. https://www.blockchain.com/btc/pushtx) and paste the redeem script into the input field.
 				
-You can then open BTCapsule and use the Sweep Wallet feature. To sweep a wallet, make sure sender_wallet.txt is
-in the same folder as BTCapsule. enter the address you wish to send your bitcoin to and the amount that was added 
-to the timelock address (minus miner fees). This will create another file called redeem.txt that will contain 
-another redeem script. Paste this into the block explorer to send the bitcoin to your wallet.
-				
-				
-				
-*IMPORTANT!* Sweeping this wallet will remove all bitcoin. You can choose to input a smaller amount to pay for 
-miner fees. The difference between the unspent amount and the input will go to the miners. If you choose to input
-the full amount, you must add some satoshis to the timelock address to cover the fees.
-To give the timelocked wallet to another person, copy BTCapsule, receiver_wallet.txt, and timelock_qr_copy.png 
-to a flash drive. DO NOT INCLUDE SENDER WALLET. Directions to redeem are included in their wallet.
-				
-				
-				"""
-
-                p2sh_addr = p2sh.get()
-
-                sender_wallet = open("sender_wallet.txt", "w")
-
-                sender_wallet.write(
-                    "TxId: "
-                    + f"{sender_txid}"
-                    + "\n\nPrivate key: "
-                    + f"{sender_privk}"
-                    + "\n\nPublic address: "
-                    + f"{sender_pubk}"
-                    + "\n\nTimelock address: "
-                    + f"{p2sh_addr}"
-                    + "\n\nRedeem date: "
-                    + f"{iso}"
-                    + "\n\nRedeem script: "
-                    + f"{sender_signed_tx}"
-                    + "\n\n"
-                    + f"{sender_wallet_text}"
-                )
-
-                sender_wallet.close()
-
-                os.chmod("sender_wallet.txt", S_IREAD)
-
-                rec_wallet_text = """
-This is a timelocked paper wallet. Please keep this file secure and offline. Anyone with access to this 
-file can redeem your bitcoin.
-				
-You can use the redeem script to redeem your bitcoin after the redeem date. To redeem, visit a block explorer 
-(ex. https://www.blockchain.com/btc/pushtx) and paste the redeem script into the input field.
-				
-You can then open BTCapsule and use the Sweep Wallet feature. To sweep a wallet, make sure receiver_wallet.txt is
-in the same folder as BTCapsule. enter the address you wish to send your bitcoin to and the amount that was added 
-to the timelock address (minus miner fees). This will create another file called redeem.txt that will contain 
-another redeem script. Paste this into the block explorer to send the bitcoin to your wallet.
+    You can then open BTCapsule and use the Sweep Wallet feature. To sweep a wallet, make sure sender_wallet.txt is
+    in the same folder as BTCapsule. enter the address you wish to send your bitcoin to and the amount that was added 
+    to the timelock address (minus miner fees). This will create another file called redeem.txt that will contain 
+    another redeem script. Paste this into the block explorer to send the bitcoin to your wallet.
 				
 				
 				
-*IMPORTANT!* Sweeping this wallet will remove all bitcoin. You can choose to input a smaller amount to pay for 
-miner fees. The difference between the unspent amount and the input will go to the miners. If you choose to input
-the full amount, you must add some satoshis to the timelock address to cover the fees.
-The redeem time is set at 12:00AM on the redeem date. It may take several hours before the network will
-accept your redeem script. If you get an error:
-sendrawtransactiom RPC error: 
-{"code":-26,"message":"non-final"}
-this means the transaction is working as expected. Please wait a few hours and try again.
+    *IMPORTANT!* Sweeping this wallet will remove all bitcoin. You can choose to input a smaller amount to pay for 
+    miner fees. The difference between the unspent amount and the input will go to the miners. If you choose to input
+    the full amount, you must add some satoshis to the timelock address to cover the fees.
+    To give the timelocked wallet to another person, copy BTCapsule, receiver_wallet.txt, and timelock_qr_copy.png 
+    to a flash drive. DO NOT INCLUDE SENDER WALLET. Directions to redeem are included in their wallet.
 				
 				
-				"""
+				            """
 
-                rec_wallet = open("receiver_wallet.txt", "w")
+                            p2sh_addr = p2sh.get()
 
-                rec_wallet.write(
-                    "TxId: "
-                    + f"{rec_txid}"
-                    + "\n\nPrivate key: "
-                    + f"{rec_privk}"
-                    + "\n\nPublic address: "
-                    + f"{rec_pubk}"
-                    + "\n\nTimelock address: "
-                    + f"{p2sh_addr}"
-                    + "\n\nRedeem date: "
-                    + f"{iso}"
-                    + "\n\nRedeem script: "
-                    + f"{rec_signed_tx}"
-                    + "\n\n"
-                    + f"{rec_wallet_text}"
-                )
+                            sender_wallet = open("sender_wallet.txt", "w")
 
-                rec_wallet.close()
+                            sender_wallet.write(
+                                "TxId: "
+                                + f"{sender_txid}"
+                                + "\n\nPrivate key: "
+                                + f"{sender_privk}"
+                                + "\n\nPublic address: "
+                                + f"{sender_pubk}"
+                                + "\n\nTimelock address: "
+                                + f"{p2sh_addr}"
+                                + "\n\nRedeem date: "
+                                + f"{iso}"
+                                + "\n\nRedeem script: "
+                                + f"{sender_signed_tx}"
+                                + "\n\n"
+                                + f"{sender_wallet_text}"
+                            )
 
-                os.chmod("receiver_wallet.txt", S_IREAD)
+                            sender_wallet.close()
+
+                            os.chmod("sender_wallet.txt", S_IREAD)
+
+                            rec_wallet_text = """
+    This is a timelocked paper wallet. Please keep this file secure and offline. Anyone with access to this 
+    file can redeem your bitcoin.
+				
+    You can use the redeem script to redeem your bitcoin after the redeem date. To redeem, visit a block explorer 
+    (ex. https://www.blockchain.com/btc/pushtx) and paste the redeem script into the input field.
+				
+    You can then open BTCapsule and use the Sweep Wallet feature. To sweep a wallet, make sure receiver_wallet.txt is
+    in the same folder as BTCapsule. enter the address you wish to send your bitcoin to and the amount that was added 
+    to the timelock address (minus miner fees). This will create another file called redeem.txt that will contain 
+    another redeem script. Paste this into the block explorer to send the bitcoin to your wallet.
+				
+				
+				
+    *IMPORTANT!* Sweeping this wallet will remove all bitcoin. You can choose to input a smaller amount to pay for 
+    miner fees. The difference between the unspent amount and the input will go to the miners. If you choose to input
+    the full amount, you must add some satoshis to the timelock address to cover the fees.
+    The redeem time is set at 12:00AM on the redeem date. It may take several hours before the network will
+    accept your redeem script. If you get an error:
+    sendrawtransactiom RPC error: 
+    {"code":-26,"message":"non-final"}
+    this means the transaction is working as expected. Please wait a few hours and try again.
+				
+				
+				            """
+
+                            rec_wallet = open("receiver_wallet.txt", "w")
+
+                            rec_wallet.write(
+                                "TxId: "
+                                + f"{rec_txid}"
+                                + "\n\nPrivate key: "
+                                + f"{rec_privk}"
+                                + "\n\nPublic address: "
+                                + f"{rec_pubk}"
+                                + "\n\nTimelock address: "
+                                + f"{p2sh_addr}"
+                                + "\n\nRedeem date: "
+                                + f"{iso}"
+                                + "\n\nRedeem script: "
+                                + f"{rec_signed_tx}"
+                                + "\n\n"
+                                + f"{rec_wallet_text}"
+                            )
+
+                            rec_wallet.close()
+
+                            os.chmod("receiver_wallet.txt", S_IREAD)
                  
-                os.mkdir('receiver_files')
-                rec_path = 'receiver_files/'
+                            os.mkdir('receiver_files')
+                            rec_path = 'receiver_files/'
                 
-                os.mkdir('sender_files')
-                send_files = 'sender_files/'
+                            os.mkdir('sender_files')
+                            send_files = 'sender_files/'
              
-                shutil.copy('timelock_qr_copy.png', rec_path)
-                shutil.copy('receiver_wallet.txt', rec_path)
+                            shutil.copy('timelock_qr_copy.png', rec_path)
+                            shutil.copy('receiver_wallet.txt', rec_path)
                 
-                shutil.copy('BTCapsule.py', rec_path)
+                            sender_files = [f for f in os.listdir() if '.txt' in f.lower() or '.png' in f.lower()] 
+
+                            for files in sender_files: 
+
+                                new_path = send_files + files 
+                                shutil.move(files, new_path)
 
 
-                sender_files = [f for f in os.listdir() if '.txt' in f.lower() or '.png' in f.lower()] 
-
-                for files in sender_files: 
-
-                    new_path = send_files + files 
-                    shutil.move(files, new_path)
+                            if btc_exists == True:
+                                shutil.copy('BTCapsule.exe', send_files)
+                                shutil.copy('BTCapsule.exe', rec_path)
 
                 
-                shutil.copy('BTCapsule.py', send_files)
+                            if btc_py_exists == True:
+                                shutil.copy('BTCapsule.py', rec_path)
+                                shutil.copy('BTCapsule.py', send_files)
 
-                if btc_exists == True:
-                    shutil.copy('BTCapsule.exe', send_files)
-                    shutil.copy('BTCapsule.exe', rec_path)
+                            
+                
+                            if btc_linux == True:
+                                shutil.copy('BTCapsule', rec_path)
+                                shutil.copy('BTCapsule', send_files)
 
-                label1 = Label(
-                    root,
-                    bg="white",
-                    text="                    Success!                      ",
-                )
-                canvas1.create_window(225, entry_y + 270, window=label1)
+
+                            label1 = Label(
+                                root,
+                                bg="white",
+                                text="                    Success!                      ",
+                            )
+                            canvas1.create_window(225, entry_y + 270, window=label1)
+
+
+                        else:
+      
+                            canvas1.create_text(
+                                225,
+                                entry_y + 270,
+                                fill="black",
+                                font="Arial 10",
+                                text="Wallets already exist",
+                            )
+
+
+                            
+                   
+                    else:
+
+                        canvas1.create_text(
+                            225,
+                            entry_y + 135,
+                            fill="black",
+                            font="Arial 10",
+                            text="Enter a valid year: MM-DD-YYYY",
+                        )
+                else:
+
+                         
+                    canvas1.create_text(
+                        225,
+                        entry_y + 270,
+                        fill="black",
+                        font="Arial 10",
+                        text="VOUT should be 0 or 1",
+                    )
 
             else:
-
+                
                 canvas1.create_text(
                     225,
-                    entry_y + 135,
+                    entry_y + 220,
                     fill="black",
                     font="Arial 10",
-                    text="Enter a valid year: MM-DD-YYYY",
+                    text="Invalid txid/hash",
                 )
+
 
         else:
 
@@ -553,7 +605,7 @@ this means the transaction is working as expected. Please wait a few hours and t
                 text="Please enter all fields",
             )
 
-    button1 = Button(text="Enter", command=threading.Thread(target=complete).start)
+    button1 = Button(text="Enter", command=complete)
     canvas1.create_window(225, entry_y + 300, window=button1)
 
     # SWEEP WALLET
@@ -599,7 +651,7 @@ this means the transaction is working as expected. Please wait a few hours and t
 
             if sender_exists == True:
 
-                with open("sender_wallet.txt", "r") as f:
+                with open("sender_files/sender_wallet.txt", "r") as f:
 
                     f.seek(0)
                     lines = f.readlines()
@@ -627,7 +679,7 @@ this means the transaction is working as expected. Please wait a few hours and t
 
             if rec_exists == True and sender_exists == False:
 
-                with open("receiver_wallet.txt", "r") as f:
+                with open("receiver_files/receiver_wallet.txt", "r") as f:
 
                     f.seek(0)
                     lines = f.readlines()
