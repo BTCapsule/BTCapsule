@@ -1,4 +1,3 @@
-
 import os
 import os.path
 import shutil
@@ -132,42 +131,45 @@ def main():
 
     seq = Sequence(TYPE_ABSOLUTE_TIMELOCK, 500000001)
 
+    entry_x = 275
+
     entry_y = 200
 
-    canvas1 = Canvas(root, width=450, height=800, bg="white", highlightthickness=0)
+
+    canvas1 = Canvas(root, width=550, height=800, bg="white", highlightthickness=0)
 
     canvas1.pack()
 
     canvas1.create_text(
-        225, entry_y - 140, fill="black", font="Arial 10 bold", text="CREATE TIMELOCK"
+        entry_x, entry_y - 140, fill="black", font="Arial 10 bold", text="CREATE TIMELOCK"
     )
 
     canvas1.create_text(
-        225, entry_y - 95, fill="black", font="Arial 10", text="Generate a P2SH address"
+        entry_x, entry_y - 95, fill="black", font="Arial 10", text="Generate a P2SH address"
     )
 
     p2sh = Entry(root, width=42, relief=SOLID)
-    canvas1.create_window(225, entry_y - 70, window=p2sh)
+    canvas1.create_window(entry_x, entry_y - 70, window=p2sh)
 
     canvas1.create_text(
-        225, entry_y - 10, fill="black", font="Arial 10", text="Sender's Wallet"
+        entry_x, entry_y - 10, fill="black", font="Arial 10", text="Sender's Wallet"
     )
 
-    canvas1.create_text(40, entry_y + 15, fill="black", font="Arial 10", text="Priv")
+    canvas1.create_text(75, entry_y + 15, fill="black", font="Arial 10", text="Priv")
 
-    canvas1.create_text(40, entry_y + 45, fill="black", font="Arial 10", text="Addr")
+    canvas1.create_text(75, entry_y + 45, fill="black", font="Arial 10", text="Addr")
 
     sk = Entry(root, width=59, relief=SOLID)
-    canvas1.create_window(235, entry_y + 15, window=sk)
+    canvas1.create_window(entry_x + 10, entry_y + 15, window=sk)
 
     sa = Entry(root, width=58, relief=SOLID)
-    canvas1.create_window(235, entry_y + 45, window=sa)
+    canvas1.create_window(entry_x + 10, entry_y + 45, window=sa)
 
     rk = Entry(root, width=42, relief=SOLID)
-    canvas1.create_window(700, entry_y + 45, window=rk)
+    canvas1.create_window(entry_x + 475, entry_y + 45, window=rk)
 
     ra = Entry(root, width=42, relief=SOLID)
-    canvas1.create_window(700, entry_y + 75, window=ra)
+    canvas1.create_window(entry_x + 475, entry_y + 75, window=ra)
 
     rec_create_priv = PrivateKey()
     rec_privk = rec_create_priv.to_wif(compressed=True)
@@ -226,9 +228,8 @@ def main():
         sa.delete(0, END)
         sa.insert(END, f"{sender_pubk}")
         sa.bind("<FocusIn>", lambda args: sa.insert(END, ""))
-
         canvas1.create_text(
-            225,
+            entry_x,
             entry_y + -50,
             fill="black",
             font="Arial 10",
@@ -246,17 +247,17 @@ def main():
         test = ImageTk.PhotoImage(resized_image)
         label1 = Label(image=test)
         label1.image = test
-        label1.place(x=325, y=entry_y - 170)
+        label1.place(x=entry_x + 100, y=entry_y - 170)
 
     generate_private = Button(text="Generate", command=generate_wallet)
 
     generate_private.pack()
-    canvas1.create_window(390, entry_y - 70, window=generate_private)
+    canvas1.create_window(entry_x + 175, entry_y - 70, window=generate_private)
 
     root.bind("<Return>", lambda x: generate_private_key)
 
     canvas1.create_text(
-        225, entry_y + 75, fill="black", font="Arial 10", text="Enter date: MM-DD-YYYY"
+        entry_x, entry_y + 75, fill="black", font="Arial 10", text="Enter date: MM-DD-YYYY"
     )
 
     def timestamp_color():
@@ -264,14 +265,14 @@ def main():
 
     timestamp = Entry(root, fg="black", relief=SOLID)
 
-    canvas1.create_window(225, entry_y + 105, window=timestamp)
+    canvas1.create_window(entry_x, entry_y + 105, window=timestamp)
 
     txid_input = Entry(root, width=66, relief=SOLID)
 
-    canvas1.create_window(225, entry_y + 185, window=txid_input)
+    canvas1.create_window(entry_x, entry_y + 185, window=txid_input)
 
     canvas1.create_text(
-        225,
+        entry_x,
         entry_y + 160,
         fill="black",
         font="Arial 10",
@@ -280,15 +281,15 @@ def main():
 
     vout_enter = Entry(root, relief=SOLID, width=5)
 
-    canvas1.create_window(125, entry_y + 245, window=vout_enter)
+    canvas1.create_window(entry_x - 100, entry_y + 245, window=vout_enter)
 
-    canvas1.create_text(125, entry_y + 220, fill="black", font="Arial 10", text="VOUT")
+    canvas1.create_text(entry_x - 100, entry_y + 220, fill="black", font="Arial 10", text="VOUT")
     
     amount = Entry(root, relief=SOLID, width=20)
 
-    canvas1.create_window(355, entry_y + 245, window=amount)
+    canvas1.create_window(entry_x + 130, entry_y + 245, window=amount)
 
-    canvas1.create_text(350, entry_y + 220, fill="black", font="Arial 10", text="BTC")
+    canvas1.create_text(entry_x + 125, entry_y + 220, fill="black", font="Arial 10", text="BTC")
 
     def complete():
 
@@ -339,7 +340,7 @@ def main():
                                 bg="white",
                                 text="Please wait while files are created",
                             )
-                            canvas1.create_window(225, entry_y + 270, window=label1)
+                            canvas1.create_window(entry_x, entry_y + 270, window=label1)
 
 
 
@@ -438,25 +439,25 @@ def main():
                             sender_wallet_text = """
     This is the sender's paper wallet. Please keep this file secure and offline. Anyone with access to this 
     file can redeem your bitcoin.
-				
+                                
     You can use the redeem script to redeem your bitcoin at any time. To redeem, visit a block explorer 
     (ex. https://www.blockchain.com/btc/pushtx) and paste the redeem script into the input field.
-				
+                                
     You can then open BTCapsule and use the Sweep Wallet feature. To sweep a wallet, make sure sender_wallet.txt is
     in the same folder as BTCapsule. enter the address you wish to send your bitcoin to and the amount that was added 
     to the timelock address (minus miner fees). This will create another file called redeem.txt that will contain 
     another redeem script. Paste this into the block explorer to send the bitcoin to your wallet.
-				
-				
-				
+                                
+                                
+                                
     *IMPORTANT!* Sweeping this wallet will remove all bitcoin. You can choose to input a smaller amount to pay for 
     miner fees. The difference between the unspent amount and the input will go to the miners. If you choose to input
     the full amount, you must add some satoshis to the timelock address to cover the fees.
     To give the timelocked wallet to another person, copy BTCapsule, receiver_wallet.txt, and timelock_qr_copy.png 
     to a flash drive. DO NOT INCLUDE SENDER WALLET. Directions to redeem are included in their wallet.
-				
-				
-				            """
+                                
+                                
+                                            """
 
                             p2sh_addr = p2sh.get()
 
@@ -486,17 +487,17 @@ def main():
                             rec_wallet_text = """
     This is a timelocked paper wallet. Please keep this file secure and offline. Anyone with access to this 
     file can redeem your bitcoin.
-				
+                                
     You can use the redeem script to redeem your bitcoin after the redeem date. To redeem, visit a block explorer 
     (ex. https://www.blockchain.com/btc/pushtx) and paste the redeem script into the input field.
-				
+                                
     You can then open BTCapsule and use the Sweep Wallet feature. To sweep a wallet, make sure receiver_wallet.txt is
     in the same folder as BTCapsule. enter the address you wish to send your bitcoin to and the amount that was added 
     to the timelock address (minus miner fees). This will create another file called redeem.txt that will contain 
     another redeem script. Paste this into the block explorer to send the bitcoin to your wallet.
-				
-				
-				
+                                
+                                
+                                
     *IMPORTANT!* Sweeping this wallet will remove all bitcoin. You can choose to input a smaller amount to pay for 
     miner fees. The difference between the unspent amount and the input will go to the miners. If you choose to input
     the full amount, you must add some satoshis to the timelock address to cover the fees.
@@ -505,9 +506,9 @@ def main():
     sendrawtransactiom RPC error: 
     {"code":-26,"message":"non-final"}
     this means the transaction is working as expected. Please wait a few hours and try again.
-				
-				
-				            """
+                                
+                                
+                                            """
 
                             rec_wallet = open("receiver_wallet.txt", "w")
 
@@ -570,65 +571,66 @@ def main():
                                 bg="white",
                                 text="                    Success!                      ",
                             )
-                            canvas1.create_window(225, entry_y + 270, window=label1)
+                            canvas1.create_window(entry_x, entry_y + 270, window=label1)
 
 
                         else:
-      
-                            canvas1.create_text(
-                                225,
-                                entry_y + 270,
-                                fill="black",
-                                font="Arial 10",
-                                text="Wallets already exist",
+
+                            
+                            label1 = Label(
+                                root,
+                                bg="white",
+                                text="            Wallet already exists. Restart BTCapsule and try again              ",
                             )
+                            canvas1.create_window(entry_x, entry_y + 270, window=label1)
 
 
                             
                    
                     else:
 
-                        canvas1.create_text(
-                            225,
-                            entry_y + 135,
-                            fill="black",
-                            font="Arial 10",
+                                    
+                        label1 = Label(
+                            root,
+                            bg="white",
                             text="Enter a valid year: MM-DD-YYYY",
                         )
-                else:
+                        canvas1.create_window(entry_x, entry_y + 270, window=label1)
 
-                         
-                    canvas1.create_text(
-                        225,
-                        entry_y + 270,
-                        fill="black",
-                        font="Arial 10",
-                        text="VOUT should be 0 or 1",
+
+                else:
+ 
+                           
+                    label1 = Label(
+                        root,
+                        bg="white",
+                        text="       VOUT should be 0 or 1          ",
                     )
+                    canvas1.create_window(entry_x, entry_y + 270, window=label1)
 
             else:
-                
-                canvas1.create_text(
-                    225,
-                    entry_y + 220,
-                    fill="black",
-                    font="Arial 10",
+                           
+                label1 = Label(
+                    root,
+                    bg="white",
                     text="Invalid txid/hash",
                 )
+                canvas1.create_window(entry_x, entry_y + 270, window=label1)
 
 
         else:
 
-            canvas1.create_text(
-                225,
-                entry_y + 270,
-                fill="black",
-                font="Arial 10",
-                text="Please enter all fields",
+                            
+            label1 = Label(
+                root,
+                bg="white",
+                text="Please complete all fields",
             )
+            canvas1.create_window(entry_x, entry_y + 270, window=label1)
+
 
     button1 = Button(text="Enter", command=complete)
-    canvas1.create_window(225, entry_y + 300, window=button1)
+    canvas1.create_window(entry_x, entry_y + 300, window=button1)
 
     # SWEEP WALLET
 
@@ -637,35 +639,35 @@ def main():
     )
 
     canvas1.create_text(
-        225, entry_y + 370, fill="black", font="Arial 10 bold", text="SWEEP WALLET"
+        entry_x, entry_y + 370, fill="black", font="Arial 10 bold", text="SWEEP WALLET"
     )
 
     canvas1.create_text(
-        225,
+        entry_x,
         entry_y + 395,
         fill="black",
         font="Arial 10",
         text="When raw transaction is successful, use \nthis field to send funds to your own wallet",
     )
 
-    addr_enter = Entry(root, width=69, relief=SOLID)
+    addr_enter = Entry(root, width=66, relief=SOLID)
     sat_enter = Entry(root, width=60, relief=SOLID)
 
     canvas1.create_text(
-        225,
+        entry_x,
         entry_y + 425,
         fill="black",
         font="Arial 10",
         text="Enter address to send funds",
     )
 
-    canvas1.create_window(225, entry_y + 445, window=addr_enter)
+    canvas1.create_window(entry_x, entry_y + 445, window=addr_enter)
 
     canvas1.create_text(
-        225, entry_y + 475, fill="black", font="Arial 10", text="Enter BTC amoumt"
+        entry_x, entry_y + 475, fill="black", font="Arial 10", text="Enter BTC amoumt"
     )
 
-    canvas1.create_window(225, entry_y + 495, window=sat_enter)
+    canvas1.create_window(entry_x, entry_y + 495, window=sat_enter)
 
     def redeem():
 
@@ -697,7 +699,7 @@ def main():
                     bg="white",
                     text="                 Success!                   ",
                 )
-                canvas1.create_window(228, entry_y + 565, window=label1)
+                canvas1.create_window(entry_x + 3, entry_y + 565, window=label1)
 
             if rec_exists == True and sender_exists == False:
 
@@ -726,7 +728,7 @@ def main():
                     bg="white",
                     text="                 Success!                   ",
                 )
-                canvas1.create_window(228, entry_y + 565, window=label1)
+                canvas1.create_window(entry_x + 3, entry_y + 565, window=label1)
 
             if rec_exists == False and sender_exists == False:
 
@@ -735,12 +737,12 @@ def main():
                     bg="white",
                     text="Missing wallet. Move wallet to this \nfolder and restart BTCapsule",
                 )
-                canvas1.create_window(228, entry_y + 575, window=label1)
+                canvas1.create_window(entry_x + 3, entry_y + 575, window=label1)
 
     send = Button(text="Send", command=redeem)
     send.pack()
 
-    canvas1.create_window(225, entry_y + 540, window=send)
+    canvas1.create_window(entry_x, entry_y + 540, window=send)
 
     root.title("Bitcoin Time Capsule")
 
