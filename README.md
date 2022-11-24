@@ -4,9 +4,9 @@ Introducing the Bitcoin Time Capsule. You don't have to trust a lawyer or other 
 <b>How it works</b>
 
 
-BTCapsule is an open-source program that can timelock your bitcoin to a date of your choosing. You simply generate a P2SH address, add a date, the txid and vout number of your transaction, and the amount of BTC you sent to the address.
+BTCapsule is an open-source program that can timelock your bitcoin to a date of your choosing. You simply generate a P2SH address, add a date, the txid and vout number of your transaction, and the amount of BTC you sent to the address (minus miner fees).
 
-This will create two folders with several files. You will get two separate paper wallets (sender_wallet.txt and receiver_wallet.txt), and two copies of the QR code for the P2SH address to add additional funds. 
+This will create two folders with several files. You will get two separate paper wallets (sender_wallet.txt and receiver_wallet.txt).
 
 The senders_wallet will contain a redeem script that can be used at any time to get your bitcoin back, just in case you ever change your mind. It also contains the master private key used to create the transactions.
 
