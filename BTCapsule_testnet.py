@@ -289,7 +289,7 @@ def main():
 
     canvas1.create_window(entry_x + 130, entry_y + 245, window=amount)
 
-    canvas1.create_text(entry_x + 125, entry_y + 220, fill="black", font="Arial 10", text="BTC")
+    canvas1.create_text(entry_x + 125, entry_y + 220, fill="black", font="Arial 10", text="BTC- minus tx fees")
 
     def complete():
 
@@ -437,27 +437,29 @@ def main():
                             rec_txid = rec_tx.get_txid()
 
                             sender_wallet_text = """
+
     This is the sender's paper wallet. Please keep this file secure and offline. Anyone with access to this 
     file can redeem your bitcoin.
-                                
+				
     You can use the redeem script to redeem your bitcoin at any time. To redeem, visit a block explorer 
     (ex. https://www.blockchain.com/btc/pushtx) and paste the redeem script into the input field.
-                                
+				
     You can then open BTCapsule and use the Sweep Wallet feature. To sweep a wallet, make sure sender_wallet.txt is
     in the same folder as BTCapsule. enter the address you wish to send your bitcoin to and the amount that was added 
     to the timelock address (minus miner fees). This will create another file called redeem.txt that will contain 
     another redeem script. Paste this into the block explorer to send the bitcoin to your wallet.
-                                
-                                
-                                
-    *IMPORTANT!* Sweeping this wallet will remove all bitcoin. You can choose to input a smaller amount to pay for 
-    miner fees. The difference between the unspent amount and the input will go to the miners. If you choose to input
-    the full amount, you must add some satoshis to the timelock address to cover the fees.
-    To give the timelocked wallet to another person, copy BTCapsule, receiver_wallet.txt, and timelock_qr_copy.png 
+				
+	To add more funds, you can create another BTCapsule timelocked transaction and require the receiver to redeem
+    multiple redeem scripts, or you can follow the directions to sweep your sender wallet (making the receiver's wallet 
+    invalid) and create a new BTCapsule transaction with the additional funds.
+				
+    *IMPORTANT!* Sweeping this wallet will remove all bitcoin. You must input a smaller amount to pay for 
+    miner fees. The difference between the unspent amount and the input will go to the miners.
+    To give the timelocked wallet to another person, copy the receiver_files folder
     to a flash drive. DO NOT INCLUDE SENDER WALLET. Directions to redeem are included in their wallet.
-                                
-                                
-                                            """
+				
+				
+				            """
 
                             p2sh_addr = p2sh.get()
 
@@ -487,28 +489,28 @@ def main():
                             rec_wallet_text = """
     This is a timelocked paper wallet. Please keep this file secure and offline. Anyone with access to this 
     file can redeem your bitcoin.
-                                
+				
     You can use the redeem script to redeem your bitcoin after the redeem date. To redeem, visit a block explorer 
     (ex. https://www.blockchain.com/btc/pushtx) and paste the redeem script into the input field.
-                                
+				
     You can then open BTCapsule and use the Sweep Wallet feature. To sweep a wallet, make sure receiver_wallet.txt is
     in the same folder as BTCapsule. enter the address you wish to send your bitcoin to and the amount that was added 
     to the timelock address (minus miner fees). This will create another file called redeem.txt that will contain 
     another redeem script. Paste this into the block explorer to send the bitcoin to your wallet.
-                                
-                                
-                                
-    *IMPORTANT!* Sweeping this wallet will remove all bitcoin. You can choose to input a smaller amount to pay for 
-    miner fees. The difference between the unspent amount and the input will go to the miners. If you choose to input
-    the full amount, you must add some satoshis to the timelock address to cover the fees.
+				
+				
+				
+    *IMPORTANT!* Sweeping this wallet will remove all bitcoin. You must input a smaller amount to pay for 
+    miner fees. The difference between the unspent amount and the input will go to the miners.
+
     The redeem time is set at 12:00AM on the redeem date. It may take several hours before the network will
     accept your redeem script. If you get an error:
     sendrawtransactiom RPC error: 
     {"code":-26,"message":"non-final"}
     this means the transaction is working as expected. Please wait a few hours and try again.
-                                
-                                
-                                            """
+				
+				
+				            """
 
                             rec_wallet = open("receiver_wallet.txt", "w")
 
@@ -539,7 +541,6 @@ def main():
                             os.mkdir('sender_files')
                             send_files = 'sender_files/'
              
-                            shutil.copy('timelock_qr_copy.png', rec_path)
                             shutil.copy('receiver_wallet.txt', rec_path)
                 
                             sender_files = [f for f in os.listdir() if '.txt' in f.lower() or '.png' in f.lower()] 
