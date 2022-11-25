@@ -1,5 +1,8 @@
 Introducing the Bitcoin Time Capsule. You don't have to trust a lawyer or other third-party to ensure your family has access to your bitcoin. Create a timelocked wallet on BTCapsule, and when the time comes, your bitcoin will be available to whomever you choose.
 
+You can download BTCapsule for Windows or Linux and learn more at:
+
+https://btcapsule.com/
 
 <b>How it works</b>
 
@@ -20,6 +23,3 @@ When you’re ready to redeem, just visit a blockchain explorer and broadcast th
 
 To sweep your wallet, make sure the wallet with your particular redeem script is in the same folder as BTCapsule. Run BTCapsule, enter an address and the amount of BTC you want to redeem (a little less than available if you want to pay miner fees), and it will create a new file called redeem.txt that can be broadcast on a block explorer.
 
-You can download BTCapsule for Windows and learn more at:
-
-https://btcapsule.com/
