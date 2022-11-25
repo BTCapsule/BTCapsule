@@ -21,5 +21,5 @@ When you’re ready to redeem, just visit a blockchain explorer and broadcast th
 
 <b>Sweep Wallet</b>
 
-To sweep your wallet, make sure the wallet with your particular redeem script is in the same folder as BTCapsule. Run BTCapsule, enter an address and the amount of BTC you want to redeem (a little less than available if you want to pay miner fees), and it will create a new file called redeem.txt that can be broadcast on a block explorer.
+To sweep your wallet, make sure the wallet with your particular redeem script is in the same folder as BTCapsule. Run BTCapsule, enter an address and the amount of BTC to redeem (a little less than available to pay miner fees), and it will create a new file called redeem.txt that can be broadcast on a block explorer.
 
