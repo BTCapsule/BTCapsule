@@ -1,8 +1,11 @@
 Introducing the Bitcoin Time Capsule. You don't have to trust a lawyer or other third-party to ensure your family has access to your bitcoin. Create a timelocked wallet on BTCapsule, and when the time comes, your bitcoin will be available to whomever you choose.
 
-You can download BTCapsule for Windows or Linux and learn more at:
+You can download BTCapsule (testnet) for Windows or Linux and learn more at:
 
 https://btcapsule.com/
+
+
+
 
 <b>How it works</b>
 
@@ -18,6 +21,34 @@ The receiver_wallet will contain a timelocked redeem script that is not redeemab
 Just copy the receiver_files folder to a flash drive and give it to your loved one. They will not get the bitcoin until you choose, and if you’re (hopefully) still alive when the timelock expires, just redeem from your sender_wallet and create a new transaction.
 
 When you’re ready to redeem, just visit a blockchain explorer and broadcast the redeem script. Once it’s been confirmed, you can use BTCapsule’s Sweep Wallet feature.
+
+<b>How to build</b>
+
+Install Python 3 with pip
+
+Open cmd (Windows) or terminal (Linux)
+
+Run following commands:
+
+Windows and Linux:
+
+```pip3 install bitcoin-utils pypng pyqrcode Pillow==9.1.0```
+
+Add the following commands, depending on your OS:
+
+Windows:
+
+```pip3 install tk python-dateutil```
+
+Linux:
+
+```sudo apt-get install python3-dateutil python3-tk```
+
+If you would like an executable so your receiver does not need Python, install PyInstaller with ```pip3 install pyinstaller``` and then run ```python3 -m PyInstaller --onefile -w --hidden-import='PIL._tkinter_finder'```
+
+You can then run the executable and create a timelocked wallet, and the executable will be included in the ```receiver_files``` folder.
+
+
 
 <b>Sweep Wallet</b>
 
