@@ -102,8 +102,8 @@ def sweep_wallet(wa, t, s, prk, a):
 
 def main():
 
-    sender_exists = exists("sender_files/sender_wallet.txt")
-    rec_exists = exists("receiver_files/receiver_wallet.txt")
+    sender_exists = exists("sender_wallet.txt")
+    rec_exists = exists("receiver_wallet.txt")
     btc_exists = exists("BTCapsule.exe")
     btc_py_exists = exists("BTCapsule.py")
     btc_linux = exists("BTCapsule")
@@ -654,7 +654,7 @@ def main():
 
             if sender_exists == True:
 
-                with open("sender_files/sender_wallet.txt", "r") as f:
+                with open("sender_wallet.txt", "r") as f:
 
                     f.seek(0)
                     lines = f.readlines()
@@ -682,7 +682,7 @@ def main():
 
             if rec_exists == True and sender_exists == False:
 
-                with open("receiver_files/receiver_wallet.txt", "r") as f:
+                with open("receiver_wallet.txt", "r") as f:
 
                     f.seek(0)
                     lines = f.readlines()
