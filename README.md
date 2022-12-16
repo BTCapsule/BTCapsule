@@ -4,7 +4,7 @@ You can download BTCapsule (testnet) for Windows or Linux and learn more at:
 
 https://btcapsule.com/
 
-
+BTCapsule creates a P2SH address that is timelocked to 500,000,001 (the earliest timestamp recognized by the Bitcoin network) at the script level. The sender wallet contains a raw transaction that is timelocked to 500,000,001 at the transaction level and allows you, the original holder, to redeem your Bitcoin at any time. The receiver wallet contains a raw transaction that is locked at whatever date you choose, which is then converted to a unix timestamp.
 
 
 <b>How it works</b>
