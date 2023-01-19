@@ -665,7 +665,7 @@ def main():
     canvas1.create_window(entry_x, entry_y + 445, window=addr_enter)
 
     canvas1.create_text(
-        entry_x, entry_y + 475, fill="black", font="Arial 10", text="Enter BTC amoumt"
+        entry_x, entry_y + 475, fill="black", font="Arial 10", text="Enter BTC amount"
     )
 
     canvas1.create_window(entry_x, entry_y + 495, window=sat_enter)
